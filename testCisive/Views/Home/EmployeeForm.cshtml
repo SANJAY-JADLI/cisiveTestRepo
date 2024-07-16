@@ -1,0 +1,80 @@
+﻿
+@{
+    ViewData["Title"] = "EmployeeForm";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<h5>Employee Verification Form</h5>
+<small>Based on CODE, This will check whether Entered information is already available or not</small>
+
+<form id="EmploymentVerificationForm">
+    <input type="number" id="Id" name="Id" placeholder="Id">
+    <input type="text" name="Name" id="Name" placeholder="Name">
+    <input type="text" name="Code" id="Code" placeholder="Code">
+    <button type="submit">Submit</button>
+</form>
+
+<div id="response"></div>
+<br />
+<h5>List of Verified Employees</h5>
+<div id="tblDiv" style="width:300px"></div>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        //get data
+        $.ajax({
+            url: 'https://localhost:7246/api/VerifyEmployement/GetEmployees',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var list = "<table class=\"table table-bordered\"><tr><th>ID</th><th>NAME</th><th>CODE</th></th>";
+                // Iterate through the list and do something with each item
+                $.each(data, function (index, item) {
+
+                    list += "<tr><td>" + item.id + "</td><td>" + item.name + "</td><td>" + item.code + "</td></tr>";
+                  
+                    
+                });
+                list += "</table>";
+                $('#tblDiv').append(list);
+            },
+            error: function (error) {
+                console.error('Error:', error);
+            }
+        });       
+    
+
+
+
+     
+        $('#EmploymentVerificationForm').on('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+          
+            var Employee = {
+                Id: $('#Id').val(),
+                Name: $('#Name').val(),
+                Code: $('#Code').val()
+            };
+            
+          
+            $.ajax({
+                url: 'https://localhost:7246/api/VerifyEmployement/VerifyEmployee', // Replace with your API endpoint
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(Employee), 
+                success: function (data) {
+                    $('#response').text(data);
+                },
+                error: function (xhr,status,error) {
+
+                    $('#response').text('Error Occurred while Searching');
+
+                    
+                }
+            });
+        });
+    });
+</script>
+
